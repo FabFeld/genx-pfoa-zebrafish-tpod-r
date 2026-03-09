@@ -1,40 +1,90 @@
-# genx-pfoa-zebrafish-tpod-r
-# Sensitive Transcriptomic Points of Departure for GenX and PFOA – Analysis Code
+# **Sensitive Transcriptomic Points of Departure for GenX and PFOA – Analysis Code**
 
-This repository provides R code to reproduce the main analyses for the publication  
-“Sensitive Transcriptomic Points of Departure for GenX and PFOA: Implications for PFAS Risk Assessment Using Zebrafish Embryos.”  
+This repository provides R code to reproduce the main analyses for the publication\
+“Sensitive Transcriptomic Points of Departure for GenX and PFOA: Implications for PFAS Risk Assessment Using Zebrafish Embryos.”\
 It covers transcriptomic point of departure (tPOD) derivation, and pathway‑level sensitivity assessment based on zebrafish embryo (OECD TG 236) transcriptomics.
 
-## Structure
+## Repository layout
 
-- `main.R`: End‑to‑end analysis script.  
-  - imports preprocessed count matrix and sample annotation,  
-  - performs identification of regulated genes,  
-  - derives tPODs and most sensitive pathways,  
-  - produces summary tables and plots for PFOA and GenX.
-- `fun`: folder with utility functions for package loading, safe reading, data wrangling, and plotting.
+```         
+publication_repro/            # orchestration scripts and helper functions
+    fun/                       # helper functions (plotting, annotation, summaries)
+    main.R                     # per-substance DRomics driver (runs multiple substances)
+    substance_comparison.R     # stand-alone comparison runner
+    comparison_plots/          # outputs from the comparison stage
+GenX/                        # example substance folder (replace with your own data)
+    GenX_coldata.csv
+    GenX_CountMatrix.txt
+    results/                   # created by main.R
+PFOA/                        # second example substance
+    PFOA_coldata.csv
+    PFOA_CountMatrix.txt
+    results/
+results/                     # legacy comparison outputs (kept for compatibility)
+    substance_comparison/
+```
 
+## Overview
 
-## Execution
+`publication_repro/main.R` is the single entry point for the full pipeline. It loops over the configured substance folders, loads metadata/count matrices, annotates Ensembl IDs, runs DRomics selection → fitting → BMD estimation, and saves outputs in `<Substance>/results/`. The same script then generates comparison plots by sourcing the documented helpers in `publication_repro/fun/`.
 
-1. Place the processed count matrix and sample annotation file(s) in the repository (default: `data/` or project root, as expected in `main.R`).  
-2. Open an R session in the project root or set the working directory accordingly.  
-3. Install required packages once 
-4. Run the analysis:
-   - interactively by sourcing `main.R`, or  
-   - from the command line via  
-     `Rscript main.R`
+## Dependencies
 
-All key analysis steps executed by the paper (tPOD, pathway sensitivity) are triggered from `main.R`.
+Missing packages are installed automatically via `setup_packages()`. The pipeline relies on:
 
-## Outputs
+-   **Annotation**: `biomaRt`, `AnnotationDbi`, `org.Dr.eg.db`, `KEGGREST`
+-   **Data manipulation**: `dplyr`, `tibble`, `tidyr`, `purrr`, `glue`, `reshape2`, `scales`
+-   **Visualization**: `ggplot2`, `ggsci`, `grid`, `gridExtra`, `gridtext`
+-   **Modeling/performance**: `DRomics`, `parallel`
 
-The script generates, for each substance and analysis step:
+## Per-substance workflow
 
-- Figures (e.g. volcano plots, tPOD distributions, pathway sensitivity plots) written to `results/` (and subfolders if defined in `main.R`).  
-- Tabular summaries (e.g. differential expression results, tPOD tables, pathway‑level metrics) in CSV format in `results/`.
+1.  Place `<Substance>_coldata.csv` and `<Substance>_CountMatrix.txt|.csv` inside `<repo_root>/<Substance>/`.
+2.  Ensure the metadata contains a concentration column named `mConc_ug.L` (or update `main.R::conc_col`).
+3.  Run from the repository root:
 
-Exact file names and subfolders are documented in comments at the top of `main.R`.
+``` powershell
+Rscript publication_repro/main.R
+```
+
+Outputs per substance:
+
+-   `<Substance>_DRomics_results.rds`: saved DRomics object.
+-   `<Substance>_summary_table.csv`: combined summary with `method`, `BMD.zSD`, and annotation.
+-   `<Substance>_drc_<method>.png`: dose–response plots from `universal_drcplot()`.
+-   `<Substance>_session_info.txt`: session info for reproducibility.
+
+## Cross-substance comparison
+
+After the per-substance loop, `main.R` performs the comparison stage:
+
+-   Loads results with `load_dromics_result()`.
+-   Builds BMD density plots with `generate_density_plots()`.
+-   Retrieves KEGG annotations using `get_kegg_annotation()`.
+-   Generates pathway sensitivity summaries and plots with `generate_sensitivity_plot()`.
+
+Comparison outputs are stored in `publication_repro/comparison_plots/`:
+
+-   `density_comparison.pdf`
+-   `sensitivity_plot_table.csv`
+-   `sensitivity_plots.pdf`
+-   `session_info.txt`
+
+## Helper catalog (`publication_repro/fun/`)
+
+-   `add_concentration_row()` – prepares DRomics input by adding the concentration row and writing `*_DRmatrix.txt`.
+-   `load_dromics_result()` – robust loader for `<Substance>_DRomics_results.rds`.
+-   `generate_density_plots()` / `dens_plot*()` – publication-ready density plots.
+-   `build_sensitivity_table()` / `generate_sensitivity_plot()` – pathway-level summaries and sensitivity plots.
+-   `get_kegg_annotation()` – caches KEGG mapping (`kegg_annotation.tsv`).
+-   `universal_drcplot()` – standard dose–response plot wrapper for DRomics fits.
+
+## Notes
+
+-   `main.R` automatically sources all `.R` files in `publication_repro/fun/`.
+-   The script overwrites comparison outputs; archive `comparison_plots/` before re-running if needed.
+-   Add new substances by extending `substance_dirs` and providing the correct input files.
+-   Functionality was validated only for the documented R version and package versions in `session_info.txt`; results may differ with other versions.
 
 ## Data availability
 
