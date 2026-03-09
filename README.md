@@ -28,6 +28,29 @@ results/                     # legacy comparison outputs (kept for compatibility
 
 `publication_repro/main.R` is the single entry point for the full pipeline. It loops over the configured substance folders, loads metadata/count matrices, annotates Ensembl IDs, runs DRomics selection → fitting → BMD estimation, and saves outputs in `<Substance>/results/`. The same script then generates comparison plots by sourcing the documented helpers in `publication_repro/fun/`.
 
+## Execution & data download
+
+1. Download the data archive from Zenodo (10.5281/zenodo.18922913).
+2. Extract the archive **into the repository root**, so the data folders sit next to `publication_repro/`.
+3. Confirm the extracted layout matches the expected structure below before running the scripts.
+
+Expected structure after extraction:
+
+```
+<repo_root>/
+    publication_repro/
+        main.R
+        fun/
+    GenX/
+        GenX_coldata.csv
+        GenX_CountMatrix.txt
+    PFOA/
+        PFOA_coldata.csv
+        PFOA_CountMatrix.txt
+```
+
+If you use different substance names or file names, update `substance_dirs` and the input file patterns in `main.R`.
+
 ## Dependencies
 
 Missing packages are installed automatically via `setup_packages()`. The pipeline relies on:
@@ -42,10 +65,6 @@ Missing packages are installed automatically via `setup_packages()`. The pipelin
 1.  Place `<Substance>_coldata.csv` and `<Substance>_CountMatrix.txt|.csv` inside `<repo_root>/<Substance>/`.
 2.  Ensure the metadata contains a concentration column named `mConc_ug.L` (or update `main.R::conc_col`).
 3.  Run from the repository root:
-
-``` powershell
-Rscript publication_repro/main.R
-```
 
 Outputs per substance:
 
@@ -72,7 +91,6 @@ Comparison outputs are stored in `publication_repro/comparison_plots/`:
 
 ## Helper catalog (`publication_repro/fun/`)
 
--   `add_concentration_row()` – prepares DRomics input by adding the concentration row and writing `*_DRmatrix.txt`.
 -   `load_dromics_result()` – robust loader for `<Substance>_DRomics_results.rds`.
 -   `generate_density_plots()` / `dens_plot*()` – publication-ready density plots.
 -   `build_sensitivity_table()` / `generate_sensitivity_plot()` – pathway-level summaries and sensitivity plots.
@@ -85,26 +103,3 @@ Comparison outputs are stored in `publication_repro/comparison_plots/`:
 -   The script overwrites comparison outputs; archive `comparison_plots/` before re-running if needed.
 -   Add new substances by extending `substance_dirs` and providing the correct input files.
 -   Functionality was validated only for the documented R version and package versions in `session_info.txt`; results may differ with other versions.
-
-## Data availability
-
-This repository does **not** contain raw sequencing data.  
-Input data for the analyses (count matrix and sample metadata) can be obtained from:
-
-- 10.5281/zenodo.18922913
-
-Please download the data and place the files as described in the *Execution* section before running `main.R`.
-
-## Citation
-
-If you use this code, please cite:
-
-- The associated article:  
-  *Sensitive Transcriptomic Points of Departure for GenX and PFOA: Implications for PFAS Risk Assessment Using Zebrafish Embryos*  
-  [insert journal, year, volume, pages, DOI]
-
-## License
-
-This code is distributed under the [MIT/GPL‑3.0] license.  
-See the `LICENSE` file for details.
-
