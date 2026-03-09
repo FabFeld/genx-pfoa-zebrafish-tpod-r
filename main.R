@@ -27,8 +27,7 @@
 #   biomaRt, dplyr, tibble, tidyr, scales, ggplot2, gridExtra, gridtext, grid,
 #   reshape2, KEGGREST, org.Dr.eg.db, AnnotationDbi, parallel, DRomics, ggsci
 #
-# Author: (auto) Positron assistant edits — adapt metadata as needed
-# License: CC-BY or your preferred license (not set here)
+# Author: Fabian Essfeld (contact fabian.essfeld@ime.fraunhofer.de)
 ################################################################################
 
 
@@ -338,4 +337,5 @@ message("Substance comparison workflow completed. Outputs written to: ", plots_d
 session_info <- sessionInfo()
 # Write session info to the comparison plots folder for reproducibility
 si_file <- file.path(plots_dir, "session_info.txt")
+
 writeLines(capture.output(session_info), si_file)
