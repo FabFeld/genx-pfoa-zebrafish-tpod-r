@@ -91,7 +91,7 @@ Comparison outputs are stored in `publication_repro/comparison_plots/`:
 This repository does **not** contain raw sequencing data.  
 Input data for the analyses (count matrix and sample metadata) can be obtained from:
 
-- [insert Zenodo / GEO / institutional repository DOI or URL here]  
+- 10.5281/zenodo.18922913
 
 Please download the data and place the files as described in the *Execution* section before running `main.R`.
 
