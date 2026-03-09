@@ -111,4 +111,3 @@ If you use this code, please cite:
 This code is distributed under the [MIT/GPL‑3.0] license.  
 See the `LICENSE` file for details.
 
-> Wähle hier eine Lizenz (z.B. `MIT` oder `GPL-3.0`) und passe die Zeile entsprechend an.
