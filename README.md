@@ -103,9 +103,6 @@ If you use this code, please cite:
   *Sensitive Transcriptomic Points of Departure for GenX and PFOA: Implications for PFAS Risk Assessment Using Zebrafish Embryos*  
   [insert journal, year, volume, pages, DOI]
 
-- (Optional) The code repository / Zenodo record if you mint a separate DOI:  
-  [insert Zenodo DOI for the code deposition]
-
 ## License
 
 This code is distributed under the [MIT/GPL‑3.0] license.  
